@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pixel Art Canvas</title>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f0f0f0;
+    }
+    #container {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+    }
+    #canvas-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: white;
+      border: 1px solid #ccc;
+      overflow: hidden;
+    }
+    #canvas {
+      image-rendering: pixelated;
+      cursor: crosshair;
+    }
+    #controls {
+      display: flex;
+      flex-direction: column;
+      margin-left: 10px;
+    }
+    .color-palette, .extra-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-bottom: 10px;
+    }
+    .color {
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      border: 1px solid #ccc;
+    }
+    #current-color {
+      width: 60px;
+      height: 60px;
+      border: 2px solid black;
+      margin-bottom: 10px;
+    }
+    .button {
+      padding: 5px 10px;
+      background-color: #ccc;
+      border: 1px solid #888;
+      cursor: pointer;
+      text-align: center;
+    }
+    .button:hover {
+      background-color: #aaa;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <div id="canvas-container">
+      <canvas id="canvas" width="800" height="800"></canvas>
+    </div>
+    <div id="controls">
+      <div id="current-color"></div>
+      <div class="color-palette">
+        <div class="color" style="background-color: black;" data-color="#000000"></div>
+        <div class="color" style="background-color: white;" data-color="#FFFFFF"></div>
+        <div class="color" style="background-color: red;" data-color="#FF0000"></div>
+        <div class="color" style="background-color: green;" data-color="#00FF00"></div>
+        <div class="color" style="background-color: blue;" data-color="#0000FF"></div>
+        <div class="color" style="background-color: purple;" data-color="#800080"></div>
+        <div class="color" style="background-color: gray;" data-color="#808080"></div>
+        <div class="color" style="background-color: yellow;" data-color="#FFFF00"></div>
+        <div class="color" style="background-color: orange;" data-color="#FFA500"></div>
+        <div class="color" style="background-color: lightgreen;" data-color="#90EE90"></div>
+        <div class="color" style="background-color: lightblue;" data-color="#ADD8E6"></div>
+        <div class="color" style="background-color: pink;" data-color="#FFC0CB"></div>
+      </div>
+      <div class="extra-buttons">
+        <div class="button" id="brush">Brush Mode</div>
+        <div class="button" id="zoom">Zoom/Move Mode</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const currentColorEl = document.getElementById('current-color');
+    const colors = document.querySelectorAll('.color');
+    const brushButton = document.getElementById('brush');
+    const zoomButton = document.getElementById('zoom');
+
+    let currentColor = '#000000';
+    let drawing = false;
+    let mode = 'brush'; // Modes: 'brush' or 'zoom'
+    let scale = 1;
+    let offsetX = 0, offsetY = 0;
+
+    canvas.addEventListener('mousedown', (e) => {
+      if (mode === 'brush') drawing = true;
+    });
+
+    canvas.addEventListener('mouseup', () => drawing = false);
+    canvas.addEventListener('mouseleave', () => drawing = false);
+
+    canvas.addEventListener('mousemove', (e) => {
+      if (drawing && mode === 'brush') {
+        const rect = canvas.getBoundingClientRect();
+        const x = Math.floor((e.clientX - rect.left) / scale);
+        const y = Math.floor((e.clientY - rect.top) / scale);
+        ctx.fillStyle = currentColor;
+        ctx.fillRect(x, y, 1, 1);
+      }
+    });
+
+    colors.forEach(color => {
+      color.addEventListener('click', () => {
+        currentColor = color.dataset.color;
+        currentColorEl.style.backgroundColor = 
